@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/jaehue/i-want-calendar-api/controllers"
@@ -29,6 +30,7 @@ func main() {
 
 	controllers.HomeController{}.Init(e.Group("/v1"))
 	controllers.MemberController{}.Init(e.Group("/v1/members"))
+	controllers.ApplicationController{}.Init(e.Group("/v1/applications"))
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Recover())
@@ -42,6 +44,9 @@ func main() {
 				return true
 			}
 			if c.Path() == "/v1/login" {
+				return true
+			}
+			if strings.HasPrefix(c.Path(), "/v1/members/login") {
 				return true
 			}
 			return false

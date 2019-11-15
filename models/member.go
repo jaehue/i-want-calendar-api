@@ -16,17 +16,14 @@ const (
 type MemberType uint8
 
 type Member struct {
-	Id          int64      `json:"id"`
-	Name        string     `json:"name" xorm:"index"`
-	Birthday    string     `json:"birthday" xorm:"index"`
-	Mobile      string     `json:"mobile"`
-	Type        MemberType `json:"type" xorm:"index"`
-	TeacherId   int64      `json:"teacherId" xorm:"index"`
-	IsGraduated bool       `json:"isGraduated" xorm:"index"`
-	Grade       int        `json:"grade"`
-	CreatedAt   time.Time  `json:"-" xorm:"created"`
-	UpdatedAt   time.Time  `json:"-" xorm:"updated"`
-	LastChecks  []Check    `json:"lastChecks,omitempty" xorm:"-"`
+	Id                int64     `json:"id"`
+	Name              string    `json:"name" xorm:"index"`
+	Email             string    `json:"email"`
+	Mobile            string    `json:"mobile"`
+	FacebookUserId    string    `json:"facebookUserId" xorm:"index"`
+	FacebookExpiresIn int64     `json:"facebookExpiresIn"`
+	CreatedAt         time.Time `json:"-" xorm:"created"`
+	UpdatedAt         time.Time `json:"-" xorm:"updated"`
 }
 
 type Check struct {
@@ -34,8 +31,20 @@ type Check struct {
 	IsAttendance bool   `json:"isAttendance"`
 }
 
+func (Member) GetByFacebookUserId(ctx context.Context, facebookUserId string) (*Member, error) {
+	var m Member
+	has, err := factory.DB(ctx).Where("facebook_user_id = ?", facebookUserId).Get(&m)
+	if err != nil {
+		return nil, err
+	}
+	if !has {
+		return nil, nil
+	}
+	return &m, nil
+}
+
 func (m *Member) Create(ctx context.Context) error {
-	if exist, err := factory.DB(ctx).Where("name = ?", m.Name).And("birthday = ?", m.Birthday).Exist(&Member{}); err != nil {
+	if exist, err := factory.DB(ctx).Where("facebook_user_id = ?", m.FacebookUserId).Exist(&Member{}); err != nil {
 		return err
 	} else if exist {
 		return errors.New("이미 추가하셨습니다.")
