@@ -31,6 +31,10 @@ type Check struct {
 	IsAttendance bool   `json:"isAttendance"`
 }
 
+func (Member) TableName() string {
+	return "user"
+}
+
 func (Member) GetByFacebookUserId(ctx context.Context, facebookUserId string) (*Member, error) {
 	var m Member
 	has, err := factory.DB(ctx).Where("facebook_user_id = ?", facebookUserId).Get(&m)
