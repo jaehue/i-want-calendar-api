@@ -1,6 +1,5 @@
 FROM pangpanglabs/golang:builder AS builder
 
-RUN go get github.com/robfig/cron
 ADD . /go/src/github.com/jaehue/i-want-calendar-api
 WORKDIR /go/src/github.com/jaehue/i-want-calendar-api
 ENV CGO_ENABLED=0
