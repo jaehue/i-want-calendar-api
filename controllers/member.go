@@ -77,11 +77,21 @@ func (this MemberController) LoginFacebookMember(c echo.Context) error {
 		})
 	}
 
+	applications, err := models.Application{}.GetAll(c.Request().Context(), member.Id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, ApiResult{
+			Error: ApiError{
+				Message: err.Error(),
+			},
+		})
+	}
+
 	return c.JSON(http.StatusOK, ApiResult{
 		Success: true,
 		Result: map[string]interface{}{
-			"token":  token,
-			"member": member,
+			"token":        token,
+			"member":       member,
+			"applications": applications,
 		},
 	})
 
